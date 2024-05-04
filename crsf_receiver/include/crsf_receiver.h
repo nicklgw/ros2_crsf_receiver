@@ -33,11 +33,13 @@ private:
 
   std::string device;
   rclcpp::TimerBase::SharedPtr timer_;
+  rclcpp::TimerBase::SharedPtr timer_tele_;
 
   rclcpp::Publisher<CRSFChannels16>::SharedPtr channels_publisher;
   rclcpp::Publisher<CRSFLinkInfo>::SharedPtr link_publisher;
 
   void main_timer_callback();
+  void tele_timer_callback();
 };
 
 

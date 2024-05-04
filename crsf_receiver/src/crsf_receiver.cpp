@@ -32,6 +32,11 @@ CrsfReceiverNode::CrsfReceiverNode(): Node("crsf_reader_node")
         std::bind(&CrsfReceiverNode::main_timer_callback, this)
     );
     
+    timer_tele_ = this->create_wall_timer(
+        std::chrono::milliseconds(100), 
+        std::bind(&CrsfReceiverNode::tele_timer_callback, this)
+    );
+
     serial.SetDevice(device);
     serial.SetBaudRate(baudrate);
     serial.SetTimeout(period / 2);
@@ -64,6 +69,15 @@ void CrsfReceiverNode::main_timer_callback()
         CRSFLinkInfo message = convert_to_link_info(parser.get_link_info());
         link_publisher->publish(message);
     }
+}
+
+void CrsfReceiverNode::tele_timer_callback()
+{
+    // 
+    // C8 0A 08 00 4A 00 0A 00 27 10 46 DE 
+    // 回传数据 电压7.4V 电流1.0A 容量10000mAh 剩余70%
+    std::vector<uint8_t> tx_buffer = {0xC8, 0x0A, 0x08, 0x00, 0x4A, 0x00, 0x0A, 0x00, 0x27, 0x10, 0x46, 0xDE};
+    serial.WriteBinary(tx_buffer);
 }
 
 CrsfReceiverNode::~CrsfReceiverNode() {
